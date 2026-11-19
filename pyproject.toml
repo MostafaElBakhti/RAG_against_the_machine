@@ -2,4 +2,6 @@
 name = "rag-against-the-machine"
 version = "0.1.0"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "fire>=0.7.1",
+]
