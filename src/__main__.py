@@ -1,7 +1,12 @@
 import fire
+from pathlib import Path
 
 def index(max_chunk_size: int = 2000) -> str:
-    return f"Indexing with size {max_chunk_size}"
+    directory = Path("data/raw")
+
+    print(f"Maximum chunk size: {max_chunk_size}")
+    print(f"Directory exists: {directory.exists()}")
+    print(f"Is directory: {directory.is_dir()}")
 
 
 
