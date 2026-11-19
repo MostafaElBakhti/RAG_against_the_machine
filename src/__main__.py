@@ -9,7 +9,8 @@ def index(max_chunk_size: int = 2000) -> None:
     print(f"Is directory: {directory.is_dir()}")
 
     for file_path in directory.rglob("*.py"):
-        print(file_path)
+        content = file_path.read_text(encoding="utf-8")
+        print(content)
 
 
 
