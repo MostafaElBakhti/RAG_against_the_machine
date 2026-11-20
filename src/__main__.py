@@ -1,6 +1,6 @@
 import fire
 from pathlib import Path
-from .models import MinimalSource
+from .models import MinimalSource, Chunk
 
 
 def index(max_chunk_size: int = 2000) -> None:
@@ -35,7 +35,13 @@ def index(max_chunk_size: int = 2000) -> None:
                 first_character_index=start,
                 last_character_index=end
                 )
+
+            indexed_chunk = Chunk(
+                source= source,
+                text= chunk
+            )
             print(source.model_dump())
+            print(indexed_chunk.model_dump())
             # print(f"File: {file_path}")
             # print(f"Start: {start}, End: {end}")
             # print(chunk)
