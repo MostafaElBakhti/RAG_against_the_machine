@@ -1,5 +1,7 @@
 import fire
 from pathlib import Path
+from .models import MinimalSource
+
 
 def index(max_chunk_size: int = 2000) -> None:
     directory = Path("data/raw")
@@ -26,14 +28,22 @@ def index(max_chunk_size: int = 2000) -> None:
 
         for start in range(0, len(content), max_chunk_size):
             end = min(start + max_chunk_size, len(content))
-            chunk = content[start:start + max_chunk_size]
+            chunk = content[start:end]
             
-            print(f"File: {file_path}")
-            print(f"Start: {start}, End: {end}")
-            print(chunk)
+            source = MinimalSource(
+                file_path=str(file_path),
+                first_character_index=start,
+                last_character_index=end
+                )
+            print(source.model_dump())
+            # print(f"File: {file_path}")
+            # print(f"Start: {start}, End: {end}")
+            # print(chunk)
+        print("*" * 30)
 
 
 if __name__ == "__main__":
     fire.Fire({
         "index" : index
         })
+
