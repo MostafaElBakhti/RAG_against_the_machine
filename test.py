@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+import ast
 
-class Test(BaseModel):
-    name : str
-    age : int 
+content = "x = 10 + 20"
 
+tree = ast.parse(content)
 
+assignment = tree.body[0]
+target = assignment.targets[0]
 
-test = Test("mostafa", "15")
-print(test)
+print(target.id)
