@@ -28,11 +28,12 @@ def index(max_chunk_size: int = 2000) -> None:
         except (OSError , UnicodeDecodeError) as error :
             print(f"Cannot read {file_path}: {error}")
             continue
-        ranges = fixed_size_chunks(content , max_chunk_size)
-        for start in range(0, len(content), max_chunk_size):
-            end = min(start + max_chunk_size, len(content))
-            chunk = content[start:end]
+        # for start in range(0, len(content), max_chunk_size):
+        #     end = min(start + max_chunk_size, len(content))
+        #     chunk = content[start:end]
             
+        for start , end in fixed_size_chunks(content, max_chunk_size):
+            chunk = content[start:end]
 
             source = MinimalSource(
                 file_path=str(file_path),
@@ -51,11 +52,11 @@ def index(max_chunk_size: int = 2000) -> None:
             # print(f"File: {file_path}")
             # print(f"Start: {start}, End: {end}")
             # print(chunk)
-        if chunks:
-            for chunk in chunks :
-                print(chunk)
-        print(f"chunks length: {len(chunks)}")
-        print("*" * 30)
+    for chunk in chunks:
+        print(chunk.model_dump())
+
+    print(f"chunks length: {len(chunks)}")
+    print("*" * 30)
 
 
 if __name__ == "__main__":
