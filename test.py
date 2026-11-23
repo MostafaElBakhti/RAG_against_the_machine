@@ -59,15 +59,12 @@ tree = ast.parse(content)
 
 lines = content.splitlines(keepends=True)
 for node in tree.body:
-    # print(type(node).__name__)
-    # print(node._attributes)
+    if isinstance(node, ast.FunctionDef):
+        start = sum(len(line) for line in lines[:node.lineno - 1])
+        end = sum(len(line) for line in lines[:node.end_lineno])
+        function_code = content[start:end]
 
-
-    # print(lines)
-
-    functions_line = lines[node.lineno - 1:node.end_lineno]
-    function_code = "".join(functions_line)
-
-    print(str(function_code))
-# print(tree.body)
-# print(ast.dump(tree.body[0]))
+        print("Function:", node.name)
+        print("Start:", start)
+        print("End:", end)
+        print("Code:", function_code)
