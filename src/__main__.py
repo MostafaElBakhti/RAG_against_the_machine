@@ -6,6 +6,7 @@ from .chunker import fixed_size_chunks
 
 def index(max_chunk_size: int = 2000) -> None:
     directory = Path("data/raw")
+    print(dir(Path))
 
     if max_chunk_size <= 0:
         raise ValueError("max_chunk_size must be positive")
@@ -17,10 +18,10 @@ def index(max_chunk_size: int = 2000) -> None:
 
     for file_path in directory.rglob("*"):
         
-        if not file_path.is_file():
+        if file_path.suffix not in (".py", ".md", ".txt"):
             continue
         
-        if file_path.suffix not in (".py", ".md", ".txt"):
+        if not file_path.is_file():
             continue
         
         try :
