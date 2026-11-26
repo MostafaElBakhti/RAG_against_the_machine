@@ -1,19 +1,23 @@
 import fire
+import sys
 from pathlib import Path
 from .models import MinimalSource, Chunk
-from .chunker import fixed_size_chunks
+from .chunker import fixed_size_chunks,validate_chunk_size
 
 
 def index(max_chunk_size: int = 2000) -> None:
     directory = Path("data/raw")
-    print(dir(Path))
 
-    if max_chunk_size <= 0:
-        raise ValueError("max_chunk_size must be positive")
+    try:
+        validate_chunk_size(max_chunk_size)
+    except ValueError as error:
+        print(f"Error: {error}")
+        sys.exit(1)
     
     if not directory.is_dir():
-        raise NotADirectoryError(f"invalid directory : {directory}")
-    
+        print(f"Error: invalid directory: {directory}")
+        sys.exit(1)
+        
     chunks : list[Chunk] = []
 
     for file_path in directory.rglob("*"):

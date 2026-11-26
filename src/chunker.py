@@ -1,4 +1,11 @@
 import ast
+import sys
+
+def validate_chunk_size(max_chunk_size: int) -> None:
+    if not 1 <= max_chunk_size <= 2000:
+        raise ValueError(
+            "max_chunk_size must be between 1 and 2000"
+        )
 
 def fixed_size_chunks(
     content: str, max_chunk_size: int
@@ -35,8 +42,8 @@ def pack_ranges(
     
     chunks: list[tuple[int, int]] = []
     
-    current_start = None
-    current_end = None 
+    current_start: int | None = None
+    current_end: int = 0
     
     for start, end in ranges:
         
@@ -44,7 +51,7 @@ def pack_ranges(
             if current_start is not None:
                 chunks.append((current_start, current_end))
                 current_start = None
-                current_end = None
+                current_end = 0
 
             block = content[start:end]
             block_starts = line_starts(block)
@@ -57,6 +64,15 @@ def pack_ranges(
 
                 line_ranges.append((line_start, line_end))
 
+            if len(line_ranges) == 1:
+                for local_start, local_end in fixed_size_chunks(
+                    block, max_chunk_size
+                ):
+                    chunks.append(
+                        (start + local_start, start + local_end)
+                    )
+                continue
+            
             smaller_chunks = pack_ranges(
                 content, line_ranges, max_chunk_size
             )
@@ -83,6 +99,12 @@ def python_chunks(
     content: str, max_chunk_size: int
 ) -> list[tuple[int, int]]:
     """ Split Python code into chunks based on function definitions and max_chunk_size. """
+    try:
+        validate_chunk_size(max_chunk_size)
+    except ValueError as error:
+        print(f"Error: {error}")
+        sys.exit(1)
+    
     tree = ast.parse(content)
     starts = line_starts(content)
 
