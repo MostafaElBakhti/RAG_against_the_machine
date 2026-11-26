@@ -61,21 +61,20 @@ def pack_ranges(
                 content, line_ranges, max_chunk_size
             )
 
-            # NEW: Save the returned chunks
             chunks.extend(smaller_chunks)
         elif current_start is None:
             current_start = start 
             current_end = end
             
         elif end - current_start <= max_chunk_size:
-            current_end
+            current_end = end
             
         else:
             chunks.append((current_start, current_end))
             current_start = start
             current_end = end
             
-    if current_start is None:
+    if current_start is not None:
         chunks.append((current_start, current_end))
         
     return chunks
@@ -90,8 +89,7 @@ def python_chunks(
     cuts: set[int] = {0, len(content)}
 
     for node in tree.body:
-        start = starts[node.lineno - 1]
-        cuts.add(start)
+        cuts.add(starts[node.lineno - 1])
 
     sorted_cuts = sorted(cuts)
 

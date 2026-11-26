@@ -66,17 +66,33 @@
 from src.chunker import python_chunks
 
 
-content = """def add(a , b):
-    print("a")
-    return a + b 
 
-def multiply(a , b):
-    return a * b
-
-x = 10
+content = """x = 1
+def f():
+    a = 1
+    return a
+y = 2
 """
 
-ranges = python_chunks(content, 40)
+max_chunk_size = 20
+
+chunks = python_chunks(content, max_chunk_size)
+
+for start , end in chunks:
+    print("*" * 10)
+    print(content[start:end])
+
+# content = """def add(a , b):
+#     print("a")
+#     return a + b 
+
+# def multiply(a , b):
+#     return a * b
+
+# x = 10
+# """
+
+# ranges = python_chunks(content, 40)
 
 # print(ranges)
 
