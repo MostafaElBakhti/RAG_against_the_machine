@@ -76,12 +76,12 @@ def multiply(a , b):
 x = 10
 """
 
-ranges = python_chunks(content, 50)
+ranges = python_chunks(content, 40)
 
-print(ranges)
+# print(ranges)
 
-for start, end in ranges:
-    print("Start:", start)
-    print("End:", end)
-    print("Size:", end - start)
-    print(repr(content[start:end]))
+# for start, end in ranges:
+#     print("Start:", start)
+#     print("End:", end)
+#     print("Size:", end - start)
+#     print(repr(content[start:end]))

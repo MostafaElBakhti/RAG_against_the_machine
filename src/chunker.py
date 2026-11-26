@@ -28,6 +28,7 @@ def line_starts(content: str) -> list[int]:
 
 
 def pack_ranges(
+    content: str,
     ranges: list[tuple[int,int]],
     max_chunk_size: int
 ) -> list[tuple[int,int]]:
@@ -38,7 +39,31 @@ def pack_ranges(
     current_end = None 
     
     for start, end in ranges:
-        if current_start is None:
+        
+        if end - start > max_chunk_size:
+            if current_start is not None:
+                chunks.append((current_start, current_end))
+                current_start = None
+                current_end = None
+
+            block = content[start:end]
+            block_starts = line_starts(block)
+
+            line_ranges: list[tuple[int, int]] = []
+
+            for i in range(len(block_starts) - 1):
+                line_start = start + block_starts[i]
+                line_end = start + block_starts[i + 1]
+
+                line_ranges.append((line_start, line_end))
+
+            smaller_chunks = pack_ranges(
+                content, line_ranges, max_chunk_size
+            )
+
+            # NEW: Save the returned chunks
+            chunks.extend(smaller_chunks)
+        elif current_start is None:
             current_start = start 
             current_end = end
             
@@ -78,7 +103,7 @@ def python_chunks(
 
         ranges.append((start, end))
 
-    return ranges
+    return pack_ranges(content, ranges, max_chunk_size)
 
 
 
