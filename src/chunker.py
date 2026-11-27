@@ -20,13 +20,18 @@ def fixed_size_chunks(
 
     return ranges
 
-def line_starts(content: str) -> list[int]: 
-    """ Return a list of starting indices for each line in the content. """
+def line_starts(content: str) -> list[int]:
     starts: list[int] = [0]
 
     for index, character in enumerate(content):
         if character == "\n":
             starts.append(index + 1)
+
+        elif character == "\r":
+            if index + 1 == len(content):
+                starts.append(index + 1)
+            elif content[index + 1] != "\n":
+                starts.append(index + 1)
 
     if starts[-1] != len(content):
         starts.append(len(content))
@@ -105,13 +110,30 @@ def python_chunks(
         print(f"Error: {error}")
         sys.exit(1)
     
-    tree = ast.parse(content)
+    try:
+        tree = ast.parse(content)
+    except (SyntaxError, ValueError, RecursionError) as error:
+        print(f"AST parsing failed: {error}", file=sys.stderr)
+        return pack_ranges(
+            content, [(0, len(content))], max_chunk_size
+        )
+    # tree = ast.parse(content)
     starts = line_starts(content)
 
     cuts: set[int] = {0, len(content)}
 
     for node in tree.body:
-        cuts.add(starts[node.lineno - 1])
+        
+        lineno = node.lineno
+        
+        if isinstance(
+            node, (ast.FunctionDef , ast.AsyncFunctionDef, ast.ClassDef)
+        ) :
+            if node.decorator_list:
+                lineno = node.decorator_list[0].lineno
+        
+        start = starts[lineno - 1]
+        cuts.add(start)
 
     sorted_cuts = sorted(cuts)
 
@@ -127,57 +149,13 @@ def python_chunks(
 
 
 
+def markdown_chunks(
+    content: str, max_chunk_size: int
+) -> list[tuple[int, int]]:
+    """Split Markdown content using structural boundaries."""
 
+    validate_chunk_size(max_chunk_size)
 
+    starts = line_starts(content)
 
-
-
-
-
-            # function_size = end - start 
-            # print(node.name , start , end , function_size)
-
-            # if function_size > max_chunk_size:
-
-            #     for statement in node.body:
-
-            #         statement_start = sum(
-            #             len(line) for line in lines[:statement.lineno - 1]
-            #         )
-
-            #         statement_end = sum(
-            #             len(line) for line in lines[:statement.end_lineno]
-            #         )
-
-            #         statement_size = statement_end - statement_start
-
-            #         if statement_size <= max_chunk_size:
-            #             chunks.append((statement_start, statement_end))
-
-            #         else:
-            #             ranges = fixed_size_chunks(
-            #                 content[statement_start:statement_end],
-            #                 max_chunk_size
-            #             )
-
-            #             for local_start, local_end in ranges:
-            #                 chunks.append((
-            #                     statement_start + local_start,
-            #                     statement_start + local_end
-            #                 ))
-
-            #     continue
-
-    #         if current_start is None:
-    #             current_start = start
-    #             current_end = end
-            
-    #         elif end - current_start <= max_chunk_size:
-    #             current_end = end
-    #         else:
-    #             chunks.append((current_start, current_end))
-    #             current_start = start
-    #             current_end = end 
-
-    # if current_start is not None:
-    #     chunks.append((current_start, current_end))
+    cuts: set[int] = {0, len(content)}

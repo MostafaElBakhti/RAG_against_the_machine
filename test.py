@@ -1,13 +1,26 @@
-from src.chunker import python_chunks
+# import ast
+# from src.chunker import line_starts
 
-content = """x = 1
-abcdefghij
-"""
+# content = "x = 1\ry = 2\rz = 3"
 
-ranges = python_chunks(content, -6)
+# tree = ast.parse(content)
 
-print(ranges)
+# for node in tree.body:
+#     print(node.lineno)
 
-for start, end in ranges:
-    print(repr(content[start:end]))
+# print(line_starts(content))
 
+from pathlib import Path
+
+file_path = Path("newline_test.txt")
+
+file_path.write_bytes(b"x = 1\r\ny = 2")
+
+with file_path.open("r", encoding="utf-8", newline="") as file:
+    content = file.read()
+
+print(repr(content))
+print(len(content))
+
+print(repr(content))
+print(len(content))
